@@ -42,6 +42,7 @@ typedef struct      s_philo
 	struct timeval  end_eat_time;
 	int 			is_dead;
 	int				is_eat;
+	int				count_eat;
 }                   t_philo;
 
 int    ft_atoi(const char *str);

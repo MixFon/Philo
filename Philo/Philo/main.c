@@ -19,6 +19,18 @@ int is_all_digits(const char *arg)
     return (SUCCESS);
 }
 
+/*
+** Количество символов не должно привышать 10
+*/
+int  check_len_arg(const char *arg)
+{
+	int i;
+
+	i = 0;
+	while(arg[i] != '\0')
+		i++;
+	return (i >= 11);
+}
 
 int check_args(int argc, const char *argv[])
 {
@@ -30,6 +42,8 @@ int check_args(int argc, const char *argv[])
     while(++i < argc)
     {
         if (is_all_digits(argv[i]) != 0)
+            return (ERROR);
+        if (check_len_arg(argv[i]) != 0)
             return (ERROR);
     }
     return(SUCCESS);
@@ -108,11 +122,11 @@ void take_or_put_forks(t_philo *philo, int take)
 	next = (curr + 1) % philo->table->number_of_philosophers;
 	philo->table->forks[curr] = take;
 	philo->table->forks[next] = take;
-//	if (take == 1)
-//		printf("%d take fork\n", curr + 1);
-//	else
-//		printf("%d put fork\n", curr + 1);
-	//print_forks(philo->table);
+	if (take)
+		printf("%d take fork\n", curr + 1);
+	else
+		printf("%d put fork\n", curr + 1);
+	print_forks(philo->table);
 }
 
 void philo_eat(t_philo *philo)
@@ -123,6 +137,7 @@ void philo_eat(t_philo *philo)
 	diff = get_diffrent_time(&philo->end_eat_time, &philo->table->start_time);
 	take_or_put_forks(philo, 1);
 	philo->is_eat = 1;
+	philo->count_eat++;
 	print_time_to_start(philo, "is eating");
 	pthread_mutex_unlock(&philo->table->mutex);
 	usleep(philo->table->time_to_eat * 1000);
@@ -171,7 +186,6 @@ void *working_philo(void *arg)
 	philo = (t_philo *)arg;
 	while (21)
 	{
-		//printf("[%d]\n", philo->is_dead);
 		while (21)
 		{
 			if (is_free_forks(philo) == 1)
@@ -213,16 +227,10 @@ int start_philo(t_table *table)
 int join_philo(t_table *table)
 {
 	int	i;
-	int	status;
 
 	i = -1;
-	status = 0;
 	while(++i < table->number_of_philosophers)
-	{
-		status = pthread_join(table->threads[i], NULL);
-		//if (status != 0)
-			//return (ERROR);
-	}
+		pthread_join(table->threads[i], NULL);
 	return (SUCCESS);
 }
 
@@ -242,7 +250,9 @@ void check_dead(t_table *table)
 		else
 			diff = get_diffrent_time(&time, &table->start_time);
 			
-		if (diff > table->time_to_die)
+		if (diff > table->time_to_die
+			|| (table->philos[i].count_eat >= table->number_of_eat
+			&& table->number_of_eat != 0))
 		{
 			table->philos[i].is_dead = 1;
 			diff = get_diffrent_time(&time, &table->start_time);
@@ -316,68 +326,39 @@ void free_data(t_table *table)
 	pthread_mutex_destroy(&table->mutex);
 }
 
+int print_error_message(const char *mess)
+{
+	printf("%s\n", mess);
+	return (ERROR);
+}
+
+int check_numbers_args(t_table *table)
+{
+	if (table->time_to_eat <= 60)
+		return (ERROR);
+	if (table->time_to_die <= 60)
+		return (ERROR);
+	if (table->time_to_sleep <= 60)
+		return (ERROR);
+	if (table->number_of_philosophers > 200)
+		return (ERROR);
+	return (SUCCESS);
+}
+
 int main(int argc, const char *argv[])
 {
     t_table table;
 
     if (check_args(argc, argv))
-    {
-        printf("Error arguments\n");
-        return (ERROR);
-    }
+        return (print_error_message("Error arguments"));
 	if (fill_prog(&table, argc, argv) != 0)
-	{
-		printf("Error malloc\n");
-		return (ERROR);
-	}
-	//if (start_cheking_thread(&table) == ERROR || start_philo(&table) == ERROR)
+        return (print_error_message("Error malloc"));
+	if (check_numbers_args(&table) == ERROR)
+        return (print_error_message("Error create"));
 	if (start_philo(&table) == ERROR)
-	{
-		printf("Error create\n");
-		return (ERROR);
-	}
+        return (print_error_message("Error create"));
 	cheking_philo_alive(&table);
-	if (join_philo(&table) == ERROR)
-	{
-		printf("Error join\n");
-		//return (ERROR);
-	}
-//	if (join_cheking_thread(&table) == ERROR)
-//	{
-//		printf("Error join cheking!!!!\n");
-//		return (ERROR);
-//	}
+	join_philo(&table);
 	free_data(&table);
     return 0;
 }
-
-//void wait_thread (void);
-//void* thread_func (void*);
-//
-//int main (int argc, char *argv[], char *envp[]) {
-//    pthread_t thread;
-//    if (pthread_create(&thread, NULL, thread_func, NULL))
-//        return 1;
-//    for (unsigned int i = 0; i < 20; i++) {
-//        puts("a");
-//        //wait_thread();
-//    }
-//    if (pthread_join(thread,NULL))
-//        return 1;
-//    return 1;
-//}
-//
-//void wait_thread (void) {
-//    time_t start_time = time(NULL);
-//    while(time(NULL) == start_time) {}
-//}
-//
-//void* thread_func(void* vptr_args) {
-//    for (unsigned int i = 0; i < 20; i++) {
-//        fputs("b\n",stderr);
-//        //wait_thread();
-//    }
-//    return NULL;
-//}
-
-
