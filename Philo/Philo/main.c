@@ -38,6 +38,7 @@ int check_args(int argc, const char *argv[])
 int fill_prog(t_table *table, int argc, const char *argv[])
 {
 	memset(table, 0, sizeof(t_table));
+	gettimeofday(&table->start_time, NULL);
 	table->number_of_philosophers = ft_atoi(argv[1]);
 	table->time_to_die = ft_atoi(argv[2]);
 	table->time_to_eat = ft_atoi(argv[3]);
@@ -49,6 +50,7 @@ int fill_prog(t_table *table, int argc, const char *argv[])
 	table->forks = (int *)malloc(sizeof(int) * table->number_of_philosophers);
 	if (table->forks == NULL)
 		return (ERROR);
+	memset(table->forks, 0, sizeof(int) * table->number_of_philosophers);
 	table->threads = (pthread_t *)malloc(sizeof(pthread_t) * table->number_of_philosophers);
 	if (table->threads == NULL)
 		return (ERROR);
@@ -56,50 +58,90 @@ int fill_prog(t_table *table, int argc, const char *argv[])
 	if (table->philos == NULL)
 		return (ERROR);
 	memset(table->philos, 0, sizeof(t_philo) * table->number_of_philosophers);
-	table->mutex = (pthread_mutex_t	*)malloc(sizeof(pthread_mutex_t));
-	if (table->mutex == NULL)
-		return (ERROR);
-	if (pthread_mutex_init(table->mutex, NULL) != 0)
+	if (pthread_mutex_init(&table->mutex, NULL) != 0)
 		return (ERROR);
 	return (SUCCESS);
 }
 
+long get_diffrent_time(struct timeval *end, struct timeval *start)
+{
+	struct timeval dtv;
 
-void philo_eat(t_philo *philo)
+	gettimeofday(end, NULL);
+	dtv.tv_sec = end->tv_sec - start->tv_sec;
+	dtv.tv_usec = end->tv_usec - start->tv_usec;
+	if(dtv.tv_usec < 0)
+	{
+		dtv.tv_sec--;
+		dtv.tv_usec += 1000000;
+	}
+	return dtv.tv_sec * 1000 + dtv.tv_usec / 1000;
+}
+
+void print_time_to_start(t_philo *philo, const char *mess)
+{
+	struct timeval  time;
+	long diff;
+	
+	diff = get_diffrent_time(&time, &philo->table->start_time);
+	printf("%ld %d %s\n", diff, philo->number + 1, mess);
+}
+
+void print_forks(t_table *table)
+{
+	int				i;
+
+	i = -1;
+	while (++i < table->number_of_philosophers)
+	{
+		printf("%d ", table->forks[i]);
+	}
+	printf("\n");
+}
+
+void take_or_put_forks(t_philo *philo, int take)
 {
 	int curr;
 	int next;
-	int diff;
 
 	curr = philo->number;
 	next = (curr + 1) % philo->table->number_of_philosophers;
-	gettimeofday(&philo->end_eat_time, NULL);
-	diff = philo->end_eat_time.tv_usec - philo->table->start_time.tv_usec;
-	printf("%d %d is eating\n", diff, philo->number + 1);
-	usleep(philo->table->time_to_eat);
-	philo->table->forks[curr] = 0;
-	philo->table->forks[next] = 0;
+	philo->table->forks[curr] = take;
+	philo->table->forks[next] = take;
+//	if (take == 1)
+//		printf("%d take fork\n", curr + 1);
+//	else
+//		printf("%d put fork\n", curr + 1);
+	//print_forks(philo->table);
+}
+
+void philo_eat(t_philo *philo)
+{
+	long diff;
+
+	pthread_mutex_lock(&philo->table->mutex);
+	diff = get_diffrent_time(&philo->end_eat_time, &philo->table->start_time);
+	take_or_put_forks(philo, 1);
+	philo->is_eat = 1;
+	print_time_to_start(philo, "is eating");
+	pthread_mutex_unlock(&philo->table->mutex);
+	usleep(philo->table->time_to_eat * 1000);
 }
 
 void philo_sleep(t_philo *philo)
 {
-	struct timeval  time;
-	int diff;
-
-	gettimeofday(&time, NULL);
-	diff = time.tv_usec - philo->table->start_time.tv_usec;
-	printf("%d %d is sleeping\n", diff, philo->number + 1);
-	usleep(philo->table->time_to_eat);
+	pthread_mutex_lock(&philo->table->mutex);
+	take_or_put_forks(philo, 0);
+	print_time_to_start(philo, "is sleeping");
+	pthread_mutex_unlock(&philo->table->mutex);
+	usleep(philo->table->time_to_sleep * 1000);
 }
 
 void philo_thing(t_philo *philo)
 {
-	struct timeval  time;
-	int diff;
-
-	gettimeofday(&time, NULL);
-	diff = time.tv_usec - philo->table->start_time.tv_usec;
-	printf("%d %d is thinking\n", diff, philo->number + 1);
+	pthread_mutex_lock(&philo->table->mutex);
+	print_time_to_start(philo, "is thinking");
+	pthread_mutex_unlock(&philo->table->mutex);
 }
 
 int is_free_forks(t_philo *philo)
@@ -108,19 +150,17 @@ int is_free_forks(t_philo *philo)
 	int curr;
 	int next;
 
-	curr = 0;
-	next = 0;
+	pthread_mutex_lock(&philo->table->mutex);
 	answ = 0;
 	curr = philo->number;
 	next = (curr + 1) % philo->table->number_of_philosophers;
-	pthread_mutex_lock(philo->table->mutex);
 	if (philo->table->forks[curr] == 0 && philo->table->forks[next] == 0)
 	{
-		philo->table->forks[curr] = 1;
-		philo->table->forks[next] = 1;
+		print_time_to_start(philo, "has taken a fork");
+		//take_or_put_forks(philo, 1);
 		answ = 1;
 	}
-	pthread_mutex_unlock(philo->table->mutex);
+	pthread_mutex_unlock(&philo->table->mutex);
 	return answ;
 }
 
@@ -131,19 +171,23 @@ void *working_philo(void *arg)
 	philo = (t_philo *)arg;
 	while (21)
 	{
+		//printf("[%d]\n", philo->is_dead);
 		while (21)
 		{
-			if (is_free_forks(philo))
+			if (is_free_forks(philo) == 1)
 				break;
 		}
 		if (philo->is_dead)
-		{
-			printf("dead %d\n", philo->number);
 			break;
-		}
 		philo_eat(philo);
-		philo_thing(philo);
+		if (philo->is_dead)
+			break;
 		philo_sleep(philo);
+		if (philo->is_dead)
+			break;
+		philo_thing(philo);
+		if (philo->is_dead)
+			break;
 	}
 	return (SUCCESS);
 }
@@ -155,7 +199,6 @@ int start_philo(t_table *table)
 
 	i = -1;
 	status = 0;
-	gettimeofday(&table->start_time, NULL);
 	while(++i < table->number_of_philosophers)
 	{
 		table->philos[i].number = i;
@@ -177,8 +220,8 @@ int join_philo(t_table *table)
 	while(++i < table->number_of_philosophers)
 	{
 		status = pthread_join(table->threads[i], NULL);
-		if (status != 0)
-			return (ERROR);
+		//if (status != 0)
+			//return (ERROR);
 	}
 	return (SUCCESS);
 }
@@ -186,22 +229,26 @@ int join_philo(t_table *table)
 void check_dead(t_table *table)
 {
 	int				i;
-	int				diff;
+	long			diff;
 	struct timeval	time;
 
 	i = -1;
-	diff = 0;
 	while (++i < table->number_of_philosophers)
 	{
-		if (table->philos[i].is_dead)
+		if (table->philos[i].is_dead == 1)
 			continue;
-		gettimeofday(&time, NULL);
-		if (table->philos[i].end_eat_time.tv_usec == 0)
-			diff = time.tv_usec - table->start_time.tv_usec;
+		if (table->philos[i].is_eat == 1)
+			diff = get_diffrent_time(&time, &table->philos[i].end_eat_time);
 		else
-			diff = time.tv_usec - table->philos[i].end_eat_time.tv_usec;
-		if (diff > table->time_to_eat)
+			diff = get_diffrent_time(&time, &table->start_time);
+			
+		if (diff > table->time_to_die)
+		{
 			table->philos[i].is_dead = 1;
+			diff = get_diffrent_time(&time, &table->start_time);
+			pthread_detach(table->threads[i]);
+			printf("%ld %d died\n", diff, i + 1);
+		}
 	}
 }
 
@@ -218,6 +265,19 @@ int is_all_dead(t_table *table)
 	return (SUCCESS);
 }
 
+void print_dead(t_table *table)
+{
+	int				i;
+
+	i = -1;
+	while (++i < table->number_of_philosophers)
+	{
+		printf("%d ", table->philos[i].is_dead);
+	}
+	printf("\n");
+}
+
+
 void *cheking_philo_alive(void *arg)
 {
 	t_table *table;
@@ -225,8 +285,10 @@ void *cheking_philo_alive(void *arg)
 	table = (t_table*)arg;
 	while(21)
 	{
+		//printf("Hello\n");
 		check_dead(table);
-		if (is_all_dead(table))
+		//print_dead(table);
+		if (is_all_dead(table) == SUCCESS)
 			break;
 	}
 	return (SUCCESS);
@@ -251,7 +313,7 @@ void free_data(t_table *table)
 	free(table->forks);
 	free(table->threads);
 	free(table->philos);
-	pthread_mutex_destroy(table->mutex);
+	pthread_mutex_destroy(&table->mutex);
 }
 
 int main(int argc, const char *argv[])
@@ -268,17 +330,23 @@ int main(int argc, const char *argv[])
 		printf("Error malloc\n");
 		return (ERROR);
 	}
-	if (start_philo(&table) == ERROR || start_cheking_thread(&table) == ERROR)
+	//if (start_cheking_thread(&table) == ERROR || start_philo(&table) == ERROR)
+	if (start_philo(&table) == ERROR)
 	{
 		printf("Error create\n");
 		return (ERROR);
 	}
-	
-	if (join_philo(&table) == ERROR || join_cheking_thread(&table) == ERROR)
+	cheking_philo_alive(&table);
+	if (join_philo(&table) == ERROR)
 	{
 		printf("Error join\n");
-		return (ERROR);
+		//return (ERROR);
 	}
+//	if (join_cheking_thread(&table) == ERROR)
+//	{
+//		printf("Error join cheking!!!!\n");
+//		return (ERROR);
+//	}
 	free_data(&table);
     return 0;
 }

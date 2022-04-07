@@ -32,7 +32,7 @@ typedef struct      s_table
 	pthread_t		*threads;
 	pthread_t		cheking_thread;
 	t_philo			*philos;
-	pthread_mutex_t	*mutex;
+	pthread_mutex_t	mutex;
 }                   t_table;
 
 typedef struct      s_philo
@@ -41,6 +41,7 @@ typedef struct      s_philo
     t_table         *table;
 	struct timeval  end_eat_time;
 	int 			is_dead;
+	int				is_eat;
 }                   t_philo;
 
 int    ft_atoi(const char *str);
