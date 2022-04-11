@@ -84,11 +84,11 @@ long get_diffrent_time(struct timeval *end, struct timeval *start)
 	gettimeofday(end, NULL);
 	dtv.tv_sec = end->tv_sec - start->tv_sec;
 	dtv.tv_usec = end->tv_usec - start->tv_usec;
-	if(dtv.tv_usec < 0)
-	{
-		dtv.tv_sec--;
-		dtv.tv_usec += 1000000;
-	}
+//	if(dtv.tv_usec < 0)
+//	{
+//		dtv.tv_sec--;
+//		dtv.tv_usec += 1000000;
+//	}
 	return dtv.tv_sec * 1000 + dtv.tv_usec / 1000;
 }
 
@@ -122,11 +122,38 @@ void take_or_put_forks(t_philo *philo, int take)
 	next = (curr + 1) % philo->table->number_of_philosophers;
 	philo->table->forks[curr] = take;
 	philo->table->forks[next] = take;
-	if (take)
-		printf("%d take fork\n", curr + 1);
-	else
-		printf("%d put fork\n", curr + 1);
-	print_forks(philo->table);
+//	if (take)
+//		printf("%d take fork\n", curr + 1);
+//	else
+//		printf("%d put fork\n", curr + 1);
+//	print_forks(philo->table);
+}
+
+// MARK: Not my
+long long	timestamp(void)
+{
+	struct timeval	t;
+
+	gettimeofday(&t, NULL);
+	return ((t.tv_sec * 1000) + (t.tv_usec / 1000));
+}
+
+long long	time_diff(long long past, long long pres)
+{
+	return (pres - past);
+}
+
+void		smart_sleep(long long time)
+{
+	long long i;
+
+	i = timestamp();
+	while (21)
+	{
+		if (time_diff(i, timestamp()) >= time)
+			break ;
+		usleep(60);
+	}
 }
 
 void philo_eat(t_philo *philo)
@@ -135,12 +162,12 @@ void philo_eat(t_philo *philo)
 
 	pthread_mutex_lock(&philo->table->mutex);
 	diff = get_diffrent_time(&philo->end_eat_time, &philo->table->start_time);
-	take_or_put_forks(philo, 1);
 	philo->is_eat = 1;
 	philo->count_eat++;
 	print_time_to_start(philo, "is eating");
 	pthread_mutex_unlock(&philo->table->mutex);
-	usleep(philo->table->time_to_eat * 1000);
+	//usleep(philo->table->time_to_eat * 1000);
+	smart_sleep(philo->table->time_to_sleep);
 }
 
 void philo_sleep(t_philo *philo)
@@ -149,7 +176,8 @@ void philo_sleep(t_philo *philo)
 	take_or_put_forks(philo, 0);
 	print_time_to_start(philo, "is sleeping");
 	pthread_mutex_unlock(&philo->table->mutex);
-	usleep(philo->table->time_to_sleep * 1000);
+	//usleep(philo->table->time_to_sleep * 1000);
+	smart_sleep(philo->table->time_to_eat);
 }
 
 void philo_thing(t_philo *philo)
@@ -172,7 +200,7 @@ int is_free_forks(t_philo *philo)
 	if (philo->table->forks[curr] == 0 && philo->table->forks[next] == 0)
 	{
 		print_time_to_start(philo, "has taken a fork");
-		//take_or_put_forks(philo, 1);
+		take_or_put_forks(philo, 1);
 		answ = 1;
 	}
 	pthread_mutex_unlock(&philo->table->mutex);

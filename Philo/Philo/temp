@@ -1,0 +1,268 @@
+0 1 has taken a fork
+1 take fork
+1 1 0 0 0 
+0 3 has taken a fork
+3 take fork
+1 1 1 1 0 
+0 3 is eating
+0 1 is eating
+1 put fork
+0 0 1 1 0 
+205 1 is sleeping
+3 put fork
+0 0 0 0 0 
+205 3 is sleeping
+205 5 has taken a fork
+5 take fork
+1 0 0 0 1 
+205 5 is eating
+205 2 has taken a fork
+2 take fork
+1 1 1 0 1 
+205 2 is eating
+5 put fork
+0 1 1 0 0 
+410 5 is sleeping
+2 put fork
+0 0 0 0 0 
+410 2 is sleeping
+410 4 has taken a fork
+4 take fork
+0 0 0 1 1 
+410 4 is eating
+410 1 is thinking
+410 3 is thinking
+411 1 has taken a fork
+1 take fork
+1 1 0 1 1 
+411 1 is eating
+615 2 is thinking
+4 put fork
+1 1 0 0 0 
+615 4 is sleeping
+615 3 has taken a fork
+3 take fork
+1 1 1 1 0 
+615 3 is eating
+615 5 is thinking
+1 put fork
+0 0 1 1 0 
+615 1 is sleeping
+616 5 has taken a fork
+5 take fork
+1 0 1 1 1 
+616 5 is eating
+820 4 is thinking
+820 1 is thinking
+3 put fork
+1 0 0 0 1 
+820 3 is sleeping
+820 2 has taken a fork
+2 take fork
+1 1 1 0 1 
+820 2 is eating
+5 put fork
+0 1 1 0 0 
+821 5 is sleeping
+821 4 has taken a fork
+4 take fork
+0 1 1 1 1 
+821 4 is eating
+1025 3 is thinking
+2 put fork
+0 0 0 1 1 
+1025 2 is sleeping
+1025 5 is thinking
+1025 1 has taken a fork
+1 take fork
+1 1 0 1 1 
+1025 1 is eating
+4 put fork
+1 1 0 0 0 
+1026 4 is sleeping
+1026 3 has taken a fork
+3 take fork
+1 1 1 1 0 
+1026 3 is eating
+1230 4 is thinking
+1230 2 is thinking
+1 put fork
+0 0 1 1 0 
+1230 1 is sleeping
+3 put fork
+0 0 0 0 0 
+1230 3 is sleeping
+1230 5 has taken a fork
+5 take fork
+1 0 0 0 1 
+1230 5 is eating
+1231 2 has taken a fork
+2 take fork
+1 1 1 0 1 
+1231 2 is eating
+5 put fork
+0 1 1 0 0 
+1435 5 is sleeping
+1435 3 is thinking
+1435 1 is thinking
+1435 4 has taken a fork
+4 take fork
+0 1 1 1 1 
+1435 4 is eating
+2 put fork
+0 0 0 1 1 
+1436 2 is sleeping
+1436 1 has taken a fork
+1 take fork
+1 1 0 1 1 
+1436 1 is eating
+4 put fork
+1 1 0 0 0 
+1640 4 is sleeping
+1640 5 is thinking
+1640 3 has taken a fork
+3 take fork
+1 1 1 1 0 
+1640 3 is eating
+1640 2 is thinking
+1 put fork
+0 0 1 1 0 
+1641 1 is sleeping
+1641 5 has taken a fork
+5 take fork
+1 0 1 1 1 
+1641 5 is eating
+1845 4 is thinking
+3 put fork
+1 0 0 0 1 
+1845 3 is sleeping
+1845 2 has taken a fork
+2 take fork
+1 1 1 0 1 
+1845 2 is eating
+1845 1 is thinking
+5 put fork
+0 1 1 0 0 
+1846 5 is sleeping
+1846 4 has taken a fork
+4 take fork
+0 1 1 1 1 
+1846 4 is eating
+2 put fork
+0 0 0 1 1 
+2050 2 is sleeping
+2050 1 has taken a fork
+1 take fork
+1 1 0 1 1 
+2050 1 is eating
+4 put fork
+1 1 0 0 0 
+2050 4 is sleeping
+2050 5 is thinking
+2050 3 is thinking
+2051 3 has taken a fork
+3 take fork
+1 1 1 1 0 
+2051 3 is eating
+1 put fork
+0 0 1 1 0 
+2255 1 is sleeping
+2255 5 has taken a fork
+5 take fork
+1 0 1 1 1 
+2255 5 is eating
+2255 2 is thinking
+2255 4 is thinking
+3 put fork
+1 0 0 0 1 
+2256 3 is sleeping
+2256 2 has taken a fork
+2 take fork
+1 1 1 0 1 
+2256 2 is eating
+2460 1 is thinking
+5 put fork
+0 1 1 0 0 
+2460 5 is sleeping
+2 put fork
+0 0 0 0 0 
+2460 2 is sleeping
+2460 4 has taken a fork
+4 take fork
+0 0 0 1 1 
+2460 4 is eating
+2461 1 has taken a fork
+1 take fork
+1 1 0 1 1 
+2461 1 is eating
+2461 3 is thinking
+2665 2 is thinking
+1 put fork
+0 0 0 1 1 
+2665 1 is sleeping
+4 put fork
+0 0 0 0 0 
+2665 4 is sleeping
+2665 3 has taken a fork
+3 take fork
+0 0 1 1 0 
+2665 3 is eating
+2665 5 is thinking
+2666 5 has taken a fork
+5 take fork
+1 0 1 1 1 
+2666 5 is eating
+2870 4 is thinking
+3 put fork
+1 0 0 0 1 
+2870 3 is sleeping
+2870 1 is thinking
+2870 2 has taken a fork
+2 take fork
+1 1 1 0 1 
+2870 2 is eating
+5 put fork
+0 1 1 0 0 
+2870 5 is sleeping
+2871 4 has taken a fork
+4 take fork
+0 1 1 1 1 
+2871 4 is eating
+3075 3 is thinking
+4 put fork
+0 1 1 0 0 
+3075 4 is sleeping
+3075 5 is thinking
+2 put fork
+0 0 0 0 0 
+3075 2 is sleeping
+3075 1 has taken a fork
+1 take fork
+1 1 0 0 0 
+3075 1 is eating
+3076 3 has taken a fork
+3 take fork
+1 1 1 1 0 
+3076 3 is eating
+3280 4 is thinking
+1 put fork
+0 0 1 1 0 
+3280 1 is sleeping
+3280 5 has taken a fork
+5 take fork
+1 0 1 1 1 
+3280 5 is eating
+3280 2 is thinking
+3 put fork
+1 0 0 0 1 
+3280 3 is sleeping
+3281 2 has taken a fork
+2 take fork
+1 1 1 0 1 
+3281 2 is eating
+3485 3 is thinking
+2 put fork
+1 0 0 0 1 
+3485 2 is sleeping
+5 put fork
+0 0 0 0 0
